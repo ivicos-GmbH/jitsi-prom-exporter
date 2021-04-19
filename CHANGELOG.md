@@ -1,6 +1,11 @@
 # Changelog
 ## Unreleased
 
+## [0.0.5]
+### Added
+- Including CI/CD deployment for automatic release process
+- Pushing first version with the current state of the repository
+
 ## [0.0.4]
 ### Added 
 - implemented fixed version of xmpp library, [thanks](https://github.com/FluuxIO/go-xmpp/issues/107)

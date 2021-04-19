@@ -1,0 +1,55 @@
+name: Standard Build CI for master branch
+
+on:
+    push:
+        branches:
+            - 'master'
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - id: changelog_reader
+        name: Get Changelog Entry
+        uses: mindsers/changelog-reader-action@v2
+        with:
+          path: ./CHANGELOG.md
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+      - name: Build and push Jitsi Prometheus Exporter container
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: samuelpmw/jitsi-prom-exporter:latest, samuelpmw/jitsi-prom-exporter:${{ steps.changelog_reader.outputs.version }}
+      - name: Image digest - Jitsi Prometheus Exporter
+        run: echo ${{ steps.docker_build.outputs.digest }}
+      - name: Create tag
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/ivicos_${{ steps.changelog_reader.outputs.version }}",
+              sha: context.sha
+            })
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ivicos_${{ steps.changelog_reader.outputs.version }}
+          tag_name: ivicos_${{ steps.changelog_reader.outputs.version }}
+          body: ${{ steps.changelog_reader.outputs.changes }}
+          prerelease: ${{ steps.changelog_reader.outputs.status == 'prereleased' }}
+          draft: ${{ steps.changelog_reader.outputs.status == 'unreleased' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
