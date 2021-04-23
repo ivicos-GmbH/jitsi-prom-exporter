@@ -29,7 +29,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: samuelpmw/jitsi-prom-exporter:latest, samuelpmw/jitsi-prom-exporter:${{ steps.changelog_reader.outputs.version }}
+          tags: ivicos/jitsi-prom-exporter:latest, ivicos/jitsi-prom-exporter:${{ steps.changelog_reader.outputs.version }}
       - name: Image digest - Jitsi Prometheus Exporter
         run: echo ${{ steps.docker_build.outputs.digest }}
       - name: Create tag
