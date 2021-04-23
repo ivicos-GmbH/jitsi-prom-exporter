@@ -1,6 +1,10 @@
 # Changelog
 ## Unreleased
 
+## [0.0.6] 2021-04-23
+### Changed
+- Container linked to Ivicos namespace
+
 ## [0.0.5]
 ### Added
 - Including CI/CD deployment for automatic release process
